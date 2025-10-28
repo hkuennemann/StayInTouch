@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>StayInTouch</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 StayInTouch</h1>
+            <p>My tool to stay in touch with my friends</p>
+        </div>
+        
+        <div class="content">
+
+            <div class="section">
+                <h2>Contact Reminders</h2>
+                <div id="reminders"></div>
+            </div>
+
+            <div class="section">
+                <h2>My Contacts</h2>
+                <div id="contacts"></div>
+            </div>
+
+            <div class="section">
+                <h2>Add New Contact</h2>
+                <form id="addForm">
+                    <div class="form-group">
+                        <label for="name">Name *</label>
+                        <input type="text" id="name" placeholder="Enter contact name" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="whatsapp">WhatsApp Number</label>
+                            <input type="text" id="whatsapp" placeholder="+1234567890">
+                        </div>
+                        <div class="form-group">
+                            <label for="birthday">Birthday</label>
+                            <input type="date" id="birthday">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="group">Contact Group</label>
+                        <select id="group">
+                            <option value="friends">Friends</option>
+                            <option value="family">Family</option>
+                            <option value="work">Work</option>
+                            <option value="acquaintances">Acquaintances</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="frequency">Reminder Frequency (in days)</label>
+                        <input type="text" id="frequency" placeholder="Or enter custom days" value="7">
+                        <div class="frequency-options">
+                            <button type="button" class="freq-btn" data-days="7">Weekly</button>
+                            <button type="button" class="freq-btn" data-days="30">Monthly</button>
+                            <button type="button" class="freq-btn" data-days="90">Quarterly</button>
+                            <button type="button" class="freq-btn" data-days="180">6 months</button>
+                            <button type="button" class="freq-btn" data-days="Birthday only">Birthday only</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" placeholder="Any additional notes about this contact..." rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Store today's date as "last contacted" date?</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="contacted_today" value="yes" checked>
+                                <span class="radio-label">Yes</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="contacted_today" value="no">
+                                <span class="radio-label">No</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn">Add Contact</button>
+                </form>
+            </div>
+    
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
