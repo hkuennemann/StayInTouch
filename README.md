@@ -70,9 +70,26 @@ The system can be set up to send daily email reminders automatically using macOS
 
 ```bash
 # Copy the plist file to LaunchAgents directory
-cp config/com.stayintouch.reminders.plist ~/Library/LaunchAgents/
+cp config/com.stayintouch.server.plist ~/Library/LaunchAgents/
 
 # Load the service
+launchctl load ~/Library/LaunchAgents/com.stayintouch.reminders.plist
+```
+
+**Customizing Reminder Time:**
+
+To change when reminders are sent, update `SERVER_START_TIME` in your `backend/.env` file:
+
+```bash
+# Set reminder time to 8:30 AM
+SERVER_START_TIME=08:30
+
+# Update the LaunchAgent schedule
+./config/update_schedule.sh
+
+# Reload the service
+launchctl unload ~/Library/LaunchAgents/com.stayintouch.reminders.plist
+cp config/com.stayintouch.server.plist ~/Library/LaunchAgents/
 launchctl load ~/Library/LaunchAgents/com.stayintouch.reminders.plist
 ```
 
