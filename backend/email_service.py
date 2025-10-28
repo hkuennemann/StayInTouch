@@ -77,12 +77,17 @@ def check_daily_reminders():
             
             # Check for regular frequency reminders (only if no birthday reminder was added)
             if not birthday_reminder_added and frequency != 'Birthday only':
-                days_since = 0
                 if last_contact:
                     days_since = int((today - datetime.strptime(last_contact, '%Y-%m-%d')).days)
+                else:
+                    # If never contacted, treat as overdue immediately
+                    days_since = 999  # Large number to ensure it shows as overdue
                 
                 if days_since >= frequency:
-                    reminders.append(f"📞 {name} - Overdue by {days_since - frequency} days")
+                    if last_contact:
+                        reminders.append(f"📞 {name} - Overdue by {days_since - frequency} days")
+                    else:
+                        reminders.append(f"📞 {name} - Never contacted")
         
         # Send email if there are reminders
         if reminders:

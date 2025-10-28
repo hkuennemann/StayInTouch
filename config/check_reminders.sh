@@ -16,10 +16,12 @@ cd "$BACKEND_DIR"
 # Activate virtual environment
 source StayInTouch_venv/bin/activate
 
-# Run the email check function directly
+# Initialize database and run the email check function
 python -c "
 import sys
 sys.path.append('.')
-from app import check_daily_reminders
+from database import init_db
+from email_service import check_daily_reminders
+init_db()  # Initialize database if it doesn't exist
 check_daily_reminders()
 "

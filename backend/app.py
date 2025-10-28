@@ -145,9 +145,11 @@ async def get_reminders():
         
         # Check for regular frequency-based reminders (only if not birthday-only)
         if frequency != 'Birthday only' and not birthday_reminder_added:
-            days_since = 0
             if last_contact:
                 days_since = int((today - datetime.strptime(last_contact, '%Y-%m-%d')).days)
+            else:
+                # If never contacted, treat as overdue immediately
+                days_since = 999  # Large number to ensure it shows as overdue
             
             if isinstance(frequency, str): # Handle case where frequency is 'Birthday only'
                 continue # Skip if it's a birthday only contact and no birthday reminder was added

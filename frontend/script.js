@@ -22,8 +22,8 @@ async function loadContacts() {
                     <p><strong>Notes:</strong> ${c.notes || 'None'}</p>
                 </div>
                 <div class="contact-actions" id="actions-${c.id}" style="display: none;">
-                    <button onclick="event.stopPropagation(); editContact(${c.id})" class="btn btn-primary">Edit</button>
                     <button onclick="event.stopPropagation(); draftMessage(${c.id})" class="btn btn-secondary">Draft Message</button>
+                    <button onclick="event.stopPropagation(); editContact(${c.id})" class="btn btn-primary">Edit</button>
                     <button onclick="event.stopPropagation(); deleteContact(${c.id})" class="btn btn-danger">Delete</button>
                 </div>
             </div>`).join('');
@@ -88,10 +88,54 @@ async function deleteContact(id) {
 }
 
 async function draftMessage(contactId) {
-    // Show a modal or prompt for custom context
-    const customPrompt = prompt("Add any additional context for the message (optional):", "");
+    // Create modal for message drafting
+    showDraftModal(contactId);
+}
+
+function showDraftModal(contactId) {
+    // Create modal overlay
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Draft Message</h3>
+                <button class="modal-close" onclick="closeDraftModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="customPrompt">Additional context (optional):</label>
+                    <textarea id="customPrompt" placeholder="Add any specific context for the message..." rows="3"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button onclick="closeDraftModal()" class="btn btn-secondary">Cancel</button>
+                    <button onclick="generateMessage(${contactId})" class="btn btn-primary">Generate Message</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    document.getElementById('customPrompt').focus();
+}
+
+function closeDraftModal() {
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+async function generateMessage(contactId) {
+    const customPrompt = document.getElementById('customPrompt').value;
     
     try {
+        // Show loading state
+        const generateBtn = document.querySelector('.modal-actions .btn-primary');
+        const originalText = generateBtn.textContent;
+        generateBtn.textContent = 'Generating...';
+        generateBtn.disabled = true;
+        
         const response = await fetch(`${API}/draft-message/${contactId}`, {
             method: 'POST',
             headers: {
@@ -105,20 +149,66 @@ async function draftMessage(contactId) {
         const data = await response.json();
         
         if (data.success) {
-            // Show the drafted message in a modal or alert
-            const message = `Drafted message for ${data.contact_name}:\n\n${data.message}`;
-            alert(message);
-            
-            // Optionally copy to clipboard
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(data.message);
-                console.log("Message copied to clipboard");
-            }
+            // Show the drafted message in the modal
+            showMessageResult(data.contact_name, data.message);
         } else {
             alert(`Error: ${data.error}`);
         }
     } catch (error) {
         alert(`Failed to draft message: ${error.message}`);
+    } finally {
+        // Reset button state
+        const generateBtn = document.querySelector('.modal-actions .btn-primary');
+        generateBtn.textContent = 'Generate Message';
+        generateBtn.disabled = false;
+    }
+}
+
+function showMessageResult(contactName, message) {
+    const modal = document.querySelector('.modal-overlay');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Drafted Message for ${contactName}</h3>
+                <button class="modal-close" onclick="closeDraftModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="message-preview">
+                    <textarea readonly rows="6" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; resize: vertical;">${message}</textarea>
+                </div>
+                <div class="modal-actions">
+                    <button onclick="closeDraftModal()" class="btn btn-secondary">Close</button>
+                    <button onclick="copyMessage('${message.replace(/'/g, "\\'")}')" class="btn btn-primary">Copy Message</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function copyMessage(message) {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(message).then(() => {
+            const copyBtn = document.querySelector('.modal-actions .btn-primary');
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'Copied!';
+            copyBtn.style.background = '#28a745';
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+                copyBtn.style.background = '';
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            alert('Failed to copy message to clipboard');
+        });
+    } else {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = message;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('Message copied to clipboard!');
     }
 }
 

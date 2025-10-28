@@ -92,5 +92,70 @@
     </div>
     
     <script src="script.js"></script>
+    <script>
+        // Auto-start server when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            checkServerStatus();
+        });
+        
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('http://localhost:8000/health');
+                if (response.ok) {
+                    console.log('✅ Server is already running');
+                    return;
+                }
+            } catch (error) {
+                console.log('🔄 Server not running, attempting to start...');
+                startServer();
+            }
+        }
+        
+        async function startServer() {
+            try {
+                // Show loading message
+                const loadingDiv = document.createElement('div');
+                loadingDiv.id = 'server-loading';
+                loadingDiv.innerHTML = `
+                    <div style="position: fixed; top: 20px; right: 20px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 20px; height: 20px; border: 2px solid #6c757d; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                            <span>Starting server...</span>
+                        </div>
+                    </div>
+                    <style>
+                        @keyframes spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    </style>
+                `;
+                document.body.appendChild(loadingDiv);
+                
+                // Try to start server (this will only work if you have a way to start it)
+                // For now, just show instructions
+                setTimeout(() => {
+                    loadingDiv.innerHTML = `
+                        <div style="position: fixed; top: 20px; right: 20px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 300px;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <span style="font-size: 20px;">⚠️</span>
+                                <strong>Server not running</strong>
+                            </div>
+                            <p style="margin: 0; font-size: 14px; color: #856404;">
+                                To start the server, run:<br>
+                                <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 12px;">
+                                    cd backend && source StayInTouch_venv/bin/activate && python app.py
+                                </code>
+                            </p>
+                            <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Dismiss</button>
+                        </div>
+                    `;
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Failed to start server:', error);
+            }
+        }
+    </script>
 </body>
 </html>
